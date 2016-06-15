@@ -155,6 +155,7 @@
 	                "placeholder": {
 	                  "en": "input",
 	                  "nl": "input"
+	                }
 	            },
 	            {
 	                "name": "device",
