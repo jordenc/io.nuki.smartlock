@@ -2,6 +2,7 @@
 
 var net = require('net');
 var devices = {};
+var tempIP, tempPort, tempToken;
 
 module.exports.settings = function( device_data, newSettingsObj, oldSettingsObj, changedKeysArr, callback ) {
 
@@ -48,9 +49,78 @@ module.exports.deleted = function( device_data ) {
 };
 
 module.exports.pair = function (socket) {
-	
-	
-	
+	// socket is a direct channel to the front-end
+
+	// this method is run when Homey.emit('list_devices') is run on the front-end
+	// which happens when you use the template `list_devices`
+	socket.on('list_devices', function (data, callback) {
+
+		Homey.log("Nuki app - list_devices tempIP is " + tempIP);
+		
+		
+		//get devices by calling /list
+		//OUTPUT: [{"nukiId": 1, "name": "Home"}, {"nukiId": 2, "name": "Grandma"}]
+		/*
+		var devices = [{
+			name				: tempIP,
+			data: {
+				id				: tempIP
+			},
+			settings: {
+				"ipaddress" 	: tempIP,
+				"port"			: tempPort,
+				"token"			: tempToken
+			},
+			capabilities: ['locked']
+		}];
+		*/
+
+		callback (null, devices);
+
+	});
+
+	// this is called when the user presses save settings button in start.html
+	socket.on('get_devices', function (data, callback) {
+
+		// Set passed pair settings in variables
+		tempIP = data.ipaddress;
+		tempPort = data.port;
+		tempToken = data.token;
+		
+		Homey.log ( "Nuki app - got get_devices from front-end, tempIP =" + tempIP + " / token = " + tempToken + " / port = " + tempPort );
+
+		// assume IP is OK and continue
+		socket.emit ('continue', null);
+
+	});
+
+	socket.on('disconnect', function(){
+		Homey.log("Nuki app - User aborted pairing, or pairing is finished");
+	})
+}
+
+
+module.exports.capabilities = {
+    locked: {
+
+        get: function( device_data, callback ){
+
+			callback (null, false);
+	        
+        },
+
+        set: function( device_data, turnon, callback ) {
+	        
+	        Homey.log('Setting device_status of ' + devices[device_data.id].settings.ipaddress + ' to ' + turnon);
+
+			if (turnon) {
+				
+			} else {
+				
+			}
+
+        }
+    }
 }
 
 
@@ -59,8 +129,7 @@ module.exports.pair = function (socket) {
 
 Homey.manager('flow').on('action.lockAction', function (callback, args) {
 	
-	//devices[args.device.id].settings.ipaddress
-	//args.
+	sendcommand (args.device.id, 'lockAction', callback);
 	
 });
 
@@ -70,6 +139,15 @@ Homey.manager('flow').on('action.lockAction.action.autocomplete', function (call
 	callback(null, items);
 });
 
+
+function sendcommand(device_id) {
+	
+	//if response status is 404 => callback ('Invalid lock ID', false);
+	//if response status is 401 => callback ('Invalid token', false);
+	if (response.batteryCritical) Homey.manager('flow').triggerDevice('batteryCritical', {}, {device: device_id});
+	if (response.success) callback (null, true); else callback (null, false);
+	
+}
 
 function searchForActions (value) {
 	
