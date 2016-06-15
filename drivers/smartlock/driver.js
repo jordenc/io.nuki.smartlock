@@ -30,10 +30,6 @@ module.exports.init = function(devices_data, callback) {
 	    
 	    module.exports.getSettings(device, function(err, settings){
 		    devices[device.id].settings = settings;
-		    
-		    startsocket (settings, device.id);	
-			callbacklog[settings.ipaddress] = {};
-	
 		});
 		
 	});
@@ -46,8 +42,6 @@ module.exports.init = function(devices_data, callback) {
 module.exports.deleted = function( device_data ) {
     
     Homey.log('deleted: ' + JSON.stringify(device_data));
-    
-    /*cmdclient[devices[device_data.id].settings.ipaddress].close();*/
     
     devices[device_data.id] = [];
 	
@@ -82,23 +76,23 @@ function searchForActions (value) {
 	var possibleInputs = [
 		{
 			inputName: "1",
-			friendlyName: "Unlock"
+			friendlyName: __("unlock")
 		},
 		{
 			inputName: "2",
-			friendlyName: "Lock"
+			friendlyName: __("lock")
 		},
 		{
 			inputName: "3",
-			friendlyName: "Unlatch"
+			friendlyName: __("unlatch")
 		},
 		{
 			inputName: "4",
-			friendlyName: "Lock 'n' go"
+			friendlyName: __("lockngo")
 		},
 		{
 			inputName: "5",
-			friendlyName: "Lock 'n' go with unlatch"
+			friendlyName: __("lockngowithunlatch")
 		}
 	];
 	

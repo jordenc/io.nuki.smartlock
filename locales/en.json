@@ -1,1 +1,18 @@
-{}
+{
+	"pair": {
+		"start": {
+			"intro": "Enable the API using the Nuki APP on your smartphone. Enter the IP address and token of your Nuki Bridge below. When you enable the API, you receive the token from the Nuki APP on your smartphone.",
+			"title": "Add device",
+			"error": "An error has occurred.",
+			"required": "All fields are required",
+			"ipAddress": "IP address",
+			"token": "Token",
+			"saveSettings": "Save settings"
+		}
+  	},
+  	"unlock": "Unlock",
+  	"lock": "Lock",
+  	"unlatch": "Unlatch",
+  	"lockngo": "Lock 'n' go",
+  	"lockngowithunlatch": "Lock 'n' go with unlatch"
+}
