@@ -1,0 +1,172 @@
+{
+    "id": "io.nuki.smartlock",
+    "name": {
+        "en": "Nuki Smartlock",
+        "nl": "Nuki Smartlock"
+    },
+    "version": "0.0.1",
+    "compatibility": "0.x || 1.x",
+    "author": {
+        "name": "Chamid Media",
+        "email": "info@chamidmedia.nl"
+    },
+    "images": {
+      "large": "./assets/images/large.jpg",
+      "small": "./assets/images/small.jpg"
+    },
+    "category": "security",
+    "description": {
+    	"en": "Nuki Smartlock app for Homey",
+		"nl": "Nuki Smartlock app voor Homey"
+    },
+    "drivers": [
+      {
+          "id": "smartlock",
+          "name": {
+              "en": "Nuki Smartlock",
+              "nl": "Nuki Smartlock"
+          },
+          "images": {
+              "large": "drivers/smartlock/assets/images/large.jpg",
+              "small": "drivers/smartlock/assets/images/small.jpg"
+          },
+          "class": "lock",
+          "capabilities": [ "" ],
+          "mobile": {
+	         "components": [ 
+	         {
+		        "id": "icon",
+		        "capabilities": ["onoff"]
+		     },
+		     {
+			    "id": "slider",
+		        "capabilities": ["volume_set"] 
+		     }
+		     ]
+          },
+          "pair": [
+            {
+              "id": "start"
+            },
+            {
+              "id": "list_devices",
+              "template": "list_devices",
+			  "navigation": {
+                    "next": "add_my_devices"
+                }
+            },
+            {
+                "id": "add_my_devices",
+                "template": "add_devices"
+            }
+          ],
+          "settings": [
+                {
+                    "type": "group",
+                    "label": {
+                        "en": "General settings",
+                        "nl": "Algemene instellingen"
+                    },
+                    "children": [
+	                    {
+	                        "id": "ipaddress",
+	                        "type": "text",
+	                        "label": {
+	                            "en": "IP address",
+	                            "nl": "IP adres"
+	                        },
+	                        "value": "0.0.0.0"
+	                    },
+	                    {
+	                        "id": "port",
+	                        "type": "text",
+	                        "label": {
+	                            "en": "Port",
+	                            "nl": "Poort"
+	                        },
+	                        "value": "8080"
+	                    },
+	                    {
+	                        "id": "token",
+	                        "type": "text",
+	                        "label": {
+	                            "en": "Token",
+	                            "nl": "Token"
+	                        },
+	                        "value": ""
+	                    }
+	                ]
+	            }
+	        ]
+      }
+    ],
+    "flow": {
+	    "triggers": [
+		    {
+		    	"id": "batteryCritical",
+				"title": {
+					"en": "Battery is critical",
+					"nl": "Batterij op kritiek niveau"
+				},
+	            "args": [
+	            {
+	                "name": "device",
+	                "type": "device",
+	                "placeholder": {
+	                  "en": "Select smartlock",
+	                  "nl": "Selecteer smartlock"
+	                },
+	                "filter": "driver_id=smartlock"
+	            }
+	            ]
+	        }
+	    ],
+	    "conditions": [
+		    {
+		    	"id": "isLocked",
+				"title": {
+					"en": "Smartlock !{{is|is not}} locked",
+					"nl": "Smartlock !{{is|is niet}} op slot"
+				},
+	            "args": [
+	            {
+	                "name": "device",
+	                "type": "device",
+	                "placeholder": {
+	                  "en": "Select smartlock",
+	                  "nl": "Selecteer smartlock"
+	                },
+	                "filter": "driver_id=smartlock"
+	            }
+	            ]
+	        }
+	    ],
+	    "actions": [
+		    {
+			    "id": "lockAction",
+			    "title": {
+				    "en": "Perform a lock operation",
+				    "nl": "Verander de status"
+			    },
+			    "args": [
+			    {
+				    "name": "input",
+	                "type": "autocomplete",
+	                "placeholder": {
+	                  "en": "input",
+	                  "nl": "input"
+	            },
+	            {
+	                "name": "device",
+	                "type": "device",
+	                "placeholder": {
+	                  "en": "Select smartlock",
+	                  "nl": "Selecteer smartlock"
+	                },
+	                "filter": "driver_id=smartlock"
+	            }
+	            ]
+		    }
+	    ]
+	}
+}
