@@ -7,9 +7,6 @@ Requires a bridge (which can be either the hardware bridge or the bridge app on 
 
 **Version 0.0.1:**
 TODO:
-- Create the sendcommand function
 - Add capabilities
-- Get list of devices from Nuki bridge
-- Add devices
 - Create correct icon.svg
 - Create correct large.jpg/small.jpg for app store (/drivers/smartlock/assets/images/)

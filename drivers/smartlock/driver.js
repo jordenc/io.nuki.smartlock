@@ -1,6 +1,6 @@
 "use strict";
 
-var net = require('net');
+var http = require('http.min');
 var devices = {};
 var tempIP, tempPort, tempToken;
 
@@ -57,25 +57,54 @@ module.exports.pair = function (socket) {
 
 		Homey.log("Nuki app - list_devices tempIP is " + tempIP);
 		
-		
 		//get devices by calling /list
-		//OUTPUT: [{"nukiId": 1, "name": "Home"}, {"nukiId": 2, "name": "Grandma"}]
-		/*
-		var devices = [{
-			name				: tempIP,
-			data: {
-				id				: tempIP
-			},
-			settings: {
-				"ipaddress" 	: tempIP,
-				"port"			: tempPort,
-				"token"			: tempToken
-			},
-			capabilities: ['locked']
-		}];
-		*/
-
-		callback (null, devices);
+		http('http://' + tempIP + ':' + tempPort + '/list?token=' + tempToken).then(function (result) {
+		
+			Homey.log('Code: ' + result.response.statusCode);
+			Homey.log('Response: ' + result.data);
+			
+			if (result.response.statusCode == 404) {
+				callback ('Invalid lock ID', false);
+			} else if (result.response.statusCode == 401) {
+				callback ('Invalid token', false);
+			} else if (result.response.statusCode == 200) {
+			
+				if (result.data) {
+				
+					var add_devices = {};
+					
+					//OUTPUT: [{"nukiId": 1, "name": "Home"}, {"nukiId": 2, "name": "Grandma"}]
+					result.data.forEach(function (key) {
+						
+						var new_device = {
+							name	: result.data.key.name,
+							data: {
+								id	:	result.data.key.nukiId
+							},
+							settings: {
+								"ipaddress":	tempIP,
+								"port"			: tempPort,
+							"token"			: tempToken
+							},
+							capabilities: ['locked']
+						}
+						add_devices.push(new_device);
+						
+					});
+					
+					Homey.log('add_devices: ' + JSON.stringify(add_devices));
+					
+					callback (null, add_devices);
+					
+				}
+				
+			} else {
+				
+				callback ('Error code sendcommand: ' + result.response.statusCode, false);
+			
+			}
+	
+		});
 
 	});
 
@@ -129,23 +158,42 @@ module.exports.capabilities = {
 
 Homey.manager('flow').on('action.lockAction', function (callback, args) {
 	
-	sendcommand (args.device.id, 'lockAction', callback);
+	sendcommand (args.device.id, 'lockAction?nukiId=' + args.device.id + '&action=' + args.input, callback);
 	
 });
 
 
 Homey.manager('flow').on('action.lockAction.action.autocomplete', function (callback, value) {
+	
 	var actions = searchForActions(value.query);
 	callback(null, items);
+
 });
 
 
-function sendcommand(device_id) {
+function sendcommand(device_id, command) {
 	
-	//if response status is 404 => callback ('Invalid lock ID', false);
-	//if response status is 401 => callback ('Invalid token', false);
-	if (response.batteryCritical) Homey.manager('flow').triggerDevice('batteryCritical', {}, {device: device_id});
-	if (response.success) callback (null, true); else callback (null, false);
+	http('http://' + devices[device_id].settings.ipaddress + ':' + devices[device_id].settings.port + '/' + command + '&token=' + devices[device_id].settings.token).then(function (result) {
+		
+		Homey.log('Code: ' + result.response.statusCode);
+		Homey.log('Response: ' + result.data);
+		
+		if (result.response.statusCode == 404) {
+			callback ('Invalid lock ID', false);
+		} else if (result.response.statusCode == 401) {
+			callback ('Invalid token', false);
+		} else if (result.response.statusCode == 200) {
+		
+			if (result.data.batteryCritical) Homey.manager('flow').triggerDevice('batteryCritical', {}, {device: device_id});
+			if (result.data.success) callback (null, true); else callback (null, false);
+		
+		} else {
+			
+			callback ('Error code sendcommand: ' + result.response.statusCode, false);
+		
+		}
+	
+	});
 	
 }
 
