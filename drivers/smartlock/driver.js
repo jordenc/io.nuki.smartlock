@@ -62,7 +62,7 @@ Homey.manager('flow').on('action.lockAction', function (callback, args) {
 	//devices[args.device.id].settings.ipaddress
 	//args.
 	
-}
+});
 
 
 Homey.manager('flow').on('action.lockAction.action.autocomplete', function (callback, value) {

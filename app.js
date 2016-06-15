@@ -2,7 +2,7 @@
 
 function init() {
 	
-	Homey.log("Hello world!");
+	Homey.log("app.js init done");
 	
 }
 
