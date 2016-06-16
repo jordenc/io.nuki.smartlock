@@ -69,33 +69,53 @@ module.exports.pair = function (socket) {
 				callback ('Invalid token', false);
 			} else if (result.response.statusCode == 200) {
 			
-				if (result.data) {
+				//OUTPUT: [{"nukiId": 1, "name": "Home"}, {"nukiId": 2, "name": "Grandma"}]
+				result.data = '[{"nukiId": 1, "name": "Home"}, {"nukiId": 2, "name": "Grandma"}]';
+				if (result.data && result.data != "[]") {
 				
+					Homey.log ('Got result.data' + JSON.stringify (result.data));
+					
+					try {
+						var parsed_data = JSON.parse (result.data);
+						//Homey.log ('parsing gelukt: ' + JSON.stringify (result.data));
+						//Homey.log ('parsing gelukt: ' + JSON.stringify (result.data[0]));
+						
+						parsed_data.forEach(function (key) {
+						
+							Homey.log ('add new device: ' + parsed_data[key].name);
+							var new_device = {
+								name	: parsed_data[key].name,
+								data: {
+									id	:	parsed_data[key].nukiId
+								},
+								settings: {
+									"ipaddress"		:	tempIP,
+									"port"			: tempPort,
+									"token"			: tempToken
+								},
+								capabilities: ['locked']
+							}
+							add_devices.push(new_device);
+							
+						});
+					} catch (e) {
+						Homey.log('error parsing: ' + JSON.stringify(e));
+					}
+					
 					var add_devices = {};
 					
-					//OUTPUT: [{"nukiId": 1, "name": "Home"}, {"nukiId": 2, "name": "Grandma"}]
-					result.data.forEach(function (key) {
-						
-						var new_device = {
-							name	: result.data.key.name,
-							data: {
-								id	:	result.data.key.nukiId
-							},
-							settings: {
-								"ipaddress":	tempIP,
-								"port"			: tempPort,
-							"token"			: tempToken
-							},
-							capabilities: ['locked']
-						}
-						add_devices.push(new_device);
-						
-					});
+					
+					
 					
 					Homey.log('add_devices: ' + JSON.stringify(add_devices));
 					
 					callback (null, add_devices);
 					
+				} else {
+				
+					Homey.log ('No devices found');	
+					callback ('No devices found', null);
+				
 				}
 				
 			} else {
