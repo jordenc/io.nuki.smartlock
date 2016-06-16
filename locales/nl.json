@@ -1,11 +1,12 @@
 {
 	"pair": {
 		"start": {
-			"intro": "Schakel met behulp van de Nuki APP op uw smartphone de API in. Vul hieronder het IP-adres en de token van uw Nuki Bridge in. De token is een reeks tekens die u ontvangt wanneer u op de Nuki APP op uw smartphone de API inschakelt.",
+			"intro": "Schakel met behulp van de Nuki APP op uw smartphone de API in. Vul hieronder het IP-adres en de token van uw Nuki Bridge in. De token is een reeks tekens die u ontvangt wanneer u op de Nuki APP op uw smartphone de API  / Developer mode inschakelt.",
 			"title": "Apparaat toevoegen",
 			"error": "Er is een fout opgetreden.",
 			"required": "Alle velden zijn verplicht.",
 			"ipAddress": "IP adres",
+			"port": "Poort",
 			"token": "Token",
 			"saveSettings": "Gegevens opslaan"
 		}
