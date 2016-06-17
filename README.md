@@ -8,4 +8,4 @@ Requires a bridge (which can be either the hardware bridge or the bridge app on 
 **Version 0.0.1:**
 TODO:
 - Add capabilities
-- Test it all :)
+- Test it all on a live lock:)

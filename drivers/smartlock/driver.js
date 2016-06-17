@@ -174,9 +174,9 @@ module.exports.capabilities = {
 
         get: function( device_data, callback ){
 
-			sendcommand (args.device.id, 'lockState?nukiId=' + args.device.id, true, function (data) {
+			sendcommand (device_data.id, 'lockState?nukiId=' + device_data.id, true, function (data) {
 		
-				callback (null, data.state);
+				if (data.state == 1) callback (null, true); else callback (null, false);
 				
 			});
 	        
