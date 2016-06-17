@@ -89,9 +89,7 @@ module.exports.pair = function (socket) {
 					
 					var add_devices = [];
 					
-					//DEBUG:
-					//var parsed_data = result.data;
-					var parsed_data = JSON.parse (result.data);
+					var parsed_data = result.data;
 						
 					for (var i = 0; i < parsed_data.length; i++) {
 						
