@@ -203,9 +203,6 @@ module.exports.capabilities = {
 
 Homey.manager('flow').on('condition.isLocked', function (callback, args) {
 	
-	//Homey.log('condition args: ' + JSON.stringify(args));
-	//args.device.id
-	
 	sendcommand (args.device.id, 'lockState?nukiId=' + args.device.id, true, function (data) {
 		
 		callback (null, data.state);
