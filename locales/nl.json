@@ -12,7 +12,7 @@
 		}
 	},
   	"unlock": "Openen",
-  	"lock": "Op slot",
+  	"lock": "Sluiten",
   	"unlatch": "Ontgrendelen",
   	"lockngo": "Automatisch vergrendelen",
   	"lockngowithunlatch": "Automatisch vergrendelen en ontgrendelen"	

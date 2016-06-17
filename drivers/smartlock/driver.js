@@ -70,23 +70,37 @@ module.exports.pair = function (socket) {
 			} else if (result.response.statusCode == 200) {
 			
 				//OUTPUT: [{"nukiId": 1, "name": "Home"}, {"nukiId": 2, "name": "Grandma"}]
-				result.data = '[{"nukiId": 1, "name": "Home"}, {"nukiId": 2, "name": "Grandma"}]';
+				//result.data = '[{"nukiId": 1, "name": "Home"}, {"nukiId": 2, "name": "Grandma"}]';
+				//DEBUG:
+				/*	
+					result.data = [{
+						nukiId: 1, 
+						name: "Home"
+					},
+					{
+						nukiId: 2, 
+						name: "Grandma"
+					}];
+				*/
+					
 				if (result.data && result.data != "[]") {
 				
 					Homey.log ('Got result.data' + JSON.stringify (result.data));
 					
-					try {
-						var parsed_data = JSON.parse (result.data);
-						//Homey.log ('parsing gelukt: ' + JSON.stringify (result.data));
-						//Homey.log ('parsing gelukt: ' + JSON.stringify (result.data[0]));
+					var add_devices = [];
+					
+					//DEBUG:
+					//var parsed_data = result.data;
+					var parsed_data = JSON.parse (result.data);
 						
-						parsed_data.forEach(function (key) {
+					for (var i = 0; i < parsed_data.length; i++) {
 						
-							Homey.log ('add new device: ' + parsed_data[key].name);
-							var new_device = {
-								name	: parsed_data[key].name,
+						Homey.log ('__add new device: ' + parsed_data[i].name);
+						add_devices.push(
+							{
+								name	: parsed_data[i].name,
 								data: {
-									id	:	parsed_data[key].nukiId
+									id	:	parsed_data[i].nukiId
 								},
 								settings: {
 									"ipaddress"		:	tempIP,
@@ -95,27 +109,33 @@ module.exports.pair = function (socket) {
 								},
 								capabilities: ['locked']
 							}
-							add_devices.push(new_device);
-							
-						});
-					} catch (e) {
-						Homey.log('error parsing: ' + JSON.stringify(e));
+						);
+						
+						devices[parsed_data[i].name] = {
+							name	: parsed_data[i].name,
+							data: {
+								id	:	parsed_data[i].nukiId
+							},
+							settings: {
+								"ipaddress"		:	tempIP,
+								"port"			: tempPort,
+								"token"			: tempToken
+							},
+							capabilities: ['locked']
+						}
+						
+						
 					}
 					
-					var add_devices = {};
-					
-					
-					
-					
 					Homey.log('add_devices: ' + JSON.stringify(add_devices));
-					
 					callback (null, add_devices);
+
 					
 				} else {
 				
 					Homey.log ('No devices found');	
 					callback ('No devices found', null);
-				
+									
 				}
 				
 			} else {
@@ -154,7 +174,11 @@ module.exports.capabilities = {
 
         get: function( device_data, callback ){
 
-			callback (null, false);
+			sendcommand (args.device.id, 'lockState?nukiId=' + args.device.id, true, function (data) {
+		
+				callback (null, data.state);
+				
+			});
 	        
         },
 
@@ -164,7 +188,11 @@ module.exports.capabilities = {
 
 			if (turnon) {
 				
+				sendcommand (device_data.id, 'lockAction?nukiId=' + device_data.id + '&action=' + 2, callback);
+				
 			} else {
+				
+				sendcommand (device_data.id, 'lockAction?nukiId=' + device_data.id + '&action=' + 1, callback);
 				
 			}
 
@@ -173,25 +201,36 @@ module.exports.capabilities = {
 }
 
 
-
+Homey.manager('flow').on('condition.isLocked', function (callback, args) {
+	
+	//Homey.log('condition args: ' + JSON.stringify(args));
+	//args.device.id
+	
+	sendcommand (args.device.id, 'lockState?nukiId=' + args.device.id, true, function (data) {
+		
+		callback (null, data.state);
+		
+	});
+	
+});
 
 
 Homey.manager('flow').on('action.lockAction', function (callback, args) {
 	
-	sendcommand (args.device.id, 'lockAction?nukiId=' + args.device.id + '&action=' + args.input, callback);
+	sendcommand (args.device.id, 'lockAction?nukiId=' + args.device.id + '&action=' + args.action.inputName, false, callback);
 	
 });
 
 
 Homey.manager('flow').on('action.lockAction.action.autocomplete', function (callback, value) {
 	
-	var actions = searchForActions(value.query);
+	var items = searchForActions(value.query);
 	callback(null, items);
 
 });
 
 
-function sendcommand(device_id, command) {
+function sendcommand(device_id, command, returndata, callback) {
 	
 	http('http://' + devices[device_id].settings.ipaddress + ':' + devices[device_id].settings.port + '/' + command + '&token=' + devices[device_id].settings.token).then(function (result) {
 		
@@ -205,8 +244,17 @@ function sendcommand(device_id, command) {
 		} else if (result.response.statusCode == 200) {
 		
 			if (result.data.batteryCritical) Homey.manager('flow').triggerDevice('batteryCritical', {}, {device: device_id});
-			if (result.data.success) callback (null, true); else callback (null, false);
+			
+			if (returndata) {
+				
+				callback (result.data);
+				
+			} else {
+				
+				if (result.data.success) callback (null, true); else callback (null, false);
 		
+			}
+			
 		} else {
 			
 			callback ('Error code sendcommand: ' + result.response.statusCode, false);

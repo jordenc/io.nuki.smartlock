@@ -31,16 +31,12 @@
               "small": "drivers/smartlock/assets/images/small.jpg"
           },
           "class": "lock",
-          "capabilities": [ "" ],
+          "capabilities": [ "locked" ],
           "mobile": {
 	         "components": [ 
 	         {
 		        "id": "icon",
-		        "capabilities": ["onoff"]
-		     },
-		     {
-			    "id": "slider",
-		        "capabilities": ["volume_set"] 
+		        "capabilities": ["locked"]
 		     }
 		     ]
           },
@@ -150,11 +146,11 @@
 			    },
 			    "args": [
 			    {
-				    "name": "input",
+				    "name": "action",
 	                "type": "autocomplete",
 	                "placeholder": {
-	                  "en": "input",
-	                  "nl": "input"
+	                  "en": "Action",
+	                  "nl": "Actie"
 	                }
 	            },
 	            {
