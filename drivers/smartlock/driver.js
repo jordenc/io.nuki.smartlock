@@ -89,8 +89,8 @@ module.exports.pair = function (socket) {
 					
 					var add_devices = [];
 					
-					var parsed_data = result.data;
-						
+					var parsed_data = JSON.parse(result.data);
+					
 					for (var i = 0; i < parsed_data.length; i++) {
 						
 						Homey.log ('__add new device: ' + parsed_data[i].name);
@@ -186,11 +186,11 @@ module.exports.capabilities = {
 
 			if (turnon) {
 				
-				sendcommand (device_data.id, 'lockAction?nukiId=' + device_data.id + '&action=' + 2, callback);
+				sendcommand (device_data.id, 'lockAction?nukiId=' + device_data.id + '&action=' + 2, false, callback);
 				
 			} else {
 				
-				sendcommand (device_data.id, 'lockAction?nukiId=' + device_data.id + '&action=' + 1, callback);
+				sendcommand (device_data.id, 'lockAction?nukiId=' + device_data.id + '&action=' + 1, false, callback);
 				
 			}
 
@@ -242,11 +242,22 @@ function sendcommand(device_id, command, returndata, callback) {
 			
 			if (returndata) {
 				
+				Homey.log ('returndata = ' + returndata);
 				callback (result.data);
 				
 			} else {
 				
-				if (result.data.success) callback (null, true); else callback (null, false);
+				//if (result.data.success) callback (null, true); else callback (null, false);
+				
+				if (result.data.success == "true") {
+					Homey.log ('return true');
+					callback (null, true);
+					
+				} else {
+					Homey.log ('false: ' + JSON.stringify (result.data.success));
+					callback (null, false);
+				
+				}
 		
 			}
 			
