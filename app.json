@@ -4,7 +4,7 @@
         "en": "Nuki Smartlock",
         "nl": "Nuki Smartlock"
     },
-    "version": "0.0.1",
+    "version": "0.1.0",
     "compatibility": "0.x || 1.x",
     "author": {
         "name": "Chamid Media",
