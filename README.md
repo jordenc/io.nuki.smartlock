@@ -5,7 +5,8 @@ Requires a bridge (which can be either the hardware bridge or the bridge app on 
 
 **Want to show your appreciation for this app? A donation is possible via http://www.d2c.nl **
 
-**Version 0.0.1:**
+**Version 0.1.0:**
+First release
+
 TODO:
 - Add capabilities
-- Test it all on a live lock:)

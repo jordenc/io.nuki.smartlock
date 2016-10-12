@@ -37,7 +37,11 @@
 	         {
 		        "id": "icon",
 		        "capabilities": ["locked"]
-		     }
+		     },
+		     {
+                    "id": "toggle",
+                    "capabilities": [ "locked" ]
+             }
 		     ]
           },
           "pair": [
