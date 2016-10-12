@@ -68,20 +68,6 @@ module.exports.pair = function (socket) {
 			} else if (result.response.statusCode == 401) {
 				callback ('Invalid token', false);
 			} else if (result.response.statusCode == 200) {
-			
-				//OUTPUT: [{"nukiId": 1, "name": "Home"}, {"nukiId": 2, "name": "Grandma"}]
-				//result.data = '[{"nukiId": 1, "name": "Home"}, {"nukiId": 2, "name": "Grandma"}]';
-				//DEBUG:
-				/*	
-					result.data = [{
-						nukiId: 1, 
-						name: "Home"
-					},
-					{
-						nukiId: 2, 
-						name: "Grandma"
-					}];
-				*/
 					
 				if (result.data && result.data != "[]") {
 				
@@ -232,6 +218,8 @@ function sendcommand(device_id, command, returndata, callback) {
 		Homey.log('Code: ' + result.response.statusCode);
 		Homey.log('Response: ' + result.data);
 		
+		result.data = JSON.parse (result.data);
+		
 		if (result.response.statusCode == 404) {
 			callback ('Invalid lock ID', false);
 		} else if (result.response.statusCode == 401) {
@@ -249,7 +237,7 @@ function sendcommand(device_id, command, returndata, callback) {
 				
 				//if (result.data.success) callback (null, true); else callback (null, false);
 				
-				if (result.data.success == "true") {
+				if (result.data.success == true) {
 					Homey.log ('return true');
 					callback (null, true);
 					
