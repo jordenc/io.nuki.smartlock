@@ -7,6 +7,3 @@ Requires a bridge (which can be either the hardware bridge or the bridge app on 
 
 **Version 0.1.0:**
 First release
-
-TODO:
-- Add capabilities

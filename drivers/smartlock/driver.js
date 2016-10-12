@@ -95,7 +95,7 @@ module.exports.pair = function (socket) {
 							}
 						);
 						
-						devices[parsed_data[i].name] = {
+						devices[parsed_data[i].nukiId] = {
 							name	: parsed_data[i].name,
 							data: {
 								id	:	parsed_data[i].nukiId
@@ -160,7 +160,7 @@ module.exports.capabilities = {
 
 			sendcommand (device_data.id, 'lockState?nukiId=' + device_data.id, true, function (data) {
 		
-				if (data.state == 1) callback (null, true); else callback (null, false);
+				if (data.stateName == "locked") callback (null, true); else callback (null, false);
 				
 			});
 	        
@@ -189,8 +189,11 @@ Homey.manager('flow').on('condition.isLocked', function (callback, args) {
 	
 	sendcommand (args.device.id, 'lockState?nukiId=' + args.device.id, true, function (data) {
 		
-		callback (null, data.state);
-		
+		if (data.stateName == "locked") {
+			callback (null, true);
+		} else {
+			callback (null, false);
+		}
 	});
 	
 });
@@ -213,6 +216,8 @@ Homey.manager('flow').on('action.lockAction.action.autocomplete', function (call
 
 function sendcommand(device_id, command, returndata, callback) {
 	
+	Homey.log('sendcommand: ' + command);
+	
 	http('http://' + devices[device_id].settings.ipaddress + ':' + devices[device_id].settings.port + '/' + command + '&token=' + devices[device_id].settings.token).then(function (result) {
 		
 		Homey.log('Code: ' + result.response.statusCode);
@@ -230,7 +235,6 @@ function sendcommand(device_id, command, returndata, callback) {
 			
 			if (returndata) {
 				
-				Homey.log ('returndata = ' + returndata);
 				callback (result.data);
 				
 			} else {
