@@ -100,8 +100,7 @@ module.exports.pair = function (socket) {
 						devices[parsed_data[i].nukiId] = {
 							name	: parsed_data[i].name,
 							data: {
-								id	:	parsed_data[i].nukiId,
-								status	:	"unlocked"
+								id	:	parsed_data[i].nukiId
 							},
 							settings: {
 								"ipaddress"		:	tempIP,
@@ -267,29 +266,39 @@ function sendcommand(device_id, command, returndata, callback) {
 }
 
 
-function polling() {
+function polling(init) {
+	
+	setTimeout(polling, 15000);
 	
 	devices.forEach(function initdevice(device) {
-	//module.exports.realtime( device_data, capability, newValue );
 	
 		sendcommand (device.id, 'lockState?nukiId=' + device.id, true, function (data) {
 		
-			if (data.stateName == "locked") {
+			//first initialisation, only save the status, don't trigger
+			if (init) {
 				
-				if (device.data.status != "locked") {
+				devices[device.id].status = data.stateName;
 				
-					module.exports.realtime( device, "locked", true );
-					devices[device.id].data.status = "locked";
-				
-				}
-				
-			} elseif (data.stateName == "unlocked") {
-
-				if (device.data.status != "unlocked") {
-				
-					module.exports.realtime( device, "locked", false );
-					devices[device.id].data.status = "unlocked";
-				
+			} else {
+			
+				if (data.stateName == "locked") {
+					
+					if (device.data.status != "locked") {
+					
+						module.exports.realtime( device, "locked", true );
+						devices[device.id].status = "locked";
+					
+					}
+					
+				} elseif (data.stateName == "unlocked") {
+	
+					if (device.data.status != "unlocked") {
+					
+						module.exports.realtime( device, "locked", false );
+						devices[device.id].status = "unlocked";
+					
+					}
+					
 				}
 				
 			}
