@@ -37,6 +37,8 @@ module.exports.init = function(devices_data, callback) {
 	
 	Homey.log("Nuki app - init done");
 	
+	setTimeout(polling (true), 15000);
+	
 	callback (null, true);
 };
 
@@ -98,7 +100,8 @@ module.exports.pair = function (socket) {
 						devices[parsed_data[i].nukiId] = {
 							name	: parsed_data[i].name,
 							data: {
-								id	:	parsed_data[i].nukiId
+								id	:	parsed_data[i].nukiId,
+								status	:	"unlocked"
 							},
 							settings: {
 								"ipaddress"		:	tempIP,
@@ -261,6 +264,39 @@ function sendcommand(device_id, command, returndata, callback) {
 	
 	});
 	
+}
+
+
+function polling() {
+	
+	devices.forEach(function initdevice(device) {
+	//module.exports.realtime( device_data, capability, newValue );
+	
+		sendcommand (device.id, 'lockState?nukiId=' + device.id, true, function (data) {
+		
+			if (data.stateName == "locked") {
+				
+				if (device.data.status != "locked") {
+				
+					module.exports.realtime( device, "locked", true );
+					devices[device.id].data.status = "locked";
+				
+				}
+				
+			} elseif (data.stateName == "unlocked") {
+
+				if (device.data.status != "unlocked") {
+				
+					module.exports.realtime( device, "locked", false );
+					devices[device.id].data.status = "unlocked";
+				
+				}
+				
+			}
+							
+		});
+	
+	}
 }
 
 function searchForActions (value) {
