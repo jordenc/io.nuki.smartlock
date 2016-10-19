@@ -32,6 +32,8 @@ module.exports.init = function(devices_data, callback) {
 		    devices[device.id].settings = settings;
 		});
 		
+		devices[device.id].device_data = device;
+	    
 	});
 	
 	Homey.log("Nuki app - init done");
@@ -314,7 +316,7 @@ function polling(init) {
 						
 							Homey.log('trigger LOCKED');
 							devices[device.id].state = {locked: true};
-							module.exports.realtime( device, "locked", true );
+							module.exports.realtime( device.device_data, "locked", true );
 							
 						
 						} else {
@@ -330,7 +332,7 @@ function polling(init) {
 						
 							Homey.log('trigger UNLOCKED');
 							devices[device.id].state = {locked: false}
-							module.exports.realtime( device, "locked", false );
+							module.exports.realtime( device.device_data, "locked", false );
 							
 							
 						} else {
