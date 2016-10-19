@@ -26,7 +26,8 @@ module.exports.init = function(devices_data, callback) {
 	    
 	    Homey.log('add device: ' + JSON.stringify(device));
 	    
-	    devices[device.id] = device;
+	    //devices[device.id] = device;
+	    devices[device.id] = Object.assign({}, device);
 	    
 	    module.exports.getSettings(device, function(err, settings){
 		    devices[device.id].settings = settings;
@@ -63,11 +64,6 @@ module.exports.pair = function (socket) {
 		//get devices by calling /list
 		http('http://' + tempIP + ':' + tempPort + '/list?token=' + tempToken).then(function (result) {
 		
-			/*
-			Homey.log('Code: ' + result.response.statusCode);
-			Homey.log('Response: ' + result.data);
-			*/
-			
 			if (result.response.statusCode == 404) {
 				callback ('Invalid lock ID', false);
 			} else if (result.response.statusCode == 401) {
@@ -277,7 +273,7 @@ function polling(init) {
 		setTimeout(polling, 5000);
 		
 	} else {
-		setTimeout(polling, 10000);
+		setTimeout(polling, 30000);
 		
 		Homey.log('_______________________________________________');
 		
@@ -310,8 +306,6 @@ function polling(init) {
 				
 					if (lockdata.stateName == "locked") {
 						
-						Homey.log('val1' + JSON.stringify(device));
-						
 						if (device.state.locked == false) {
 						
 							Homey.log('trigger LOCKED');
@@ -327,7 +321,6 @@ function polling(init) {
 						
 					} else if (lockdata.stateName == "unlocked") {
 		
-						Homey.log('device state=' + JSON.stringify (device.state.locked));
 						if (device.state.locked == true) {
 						
 							Homey.log('trigger UNLOCKED');
@@ -343,7 +336,7 @@ function polling(init) {
 						
 					} else {
 						
-						Homey.log ('data.stateName was niet locked of unlocked, maar: ' + lockdata	.stateName);	
+						Homey.log ('data.stateName was not locked or unlocked, but: ' + lockdata.stateName);	
 						
 					}
 					
