@@ -221,7 +221,7 @@ function sendcommand(device_id, command, returndata, callback) {
 	
 	Homey.log('sendcommand: ' + command);
 	
-	if (typeof devices[device_id] ===  === "undefined") {
+	if (typeof devices[device_id] === "undefined") {
 		
 		callback (null, false);
 		
