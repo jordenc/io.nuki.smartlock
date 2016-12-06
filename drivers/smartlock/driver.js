@@ -2,7 +2,7 @@
 
 var http = require('http.min');
 var devices = {};
-var tempIP, tempPort, tempToken;
+var tempIP, tempPort, tempToken, lastBatteryWarning;
 
 module.exports.settings = function( device_data, newSettingsObj, oldSettingsObj, changedKeysArr, callback ) {
 
@@ -36,6 +36,8 @@ module.exports.init = function(devices_data, callback) {
 		devices[device.id].device_data = device;
 	    
 	});
+	
+	lastBatteryWarning = '';
 	
 	Homey.log("Nuki app - init done");
 	
@@ -219,61 +221,80 @@ function sendcommand(device_id, command, returndata, callback) {
 	
 	Homey.log('sendcommand: ' + command);
 	
-	http('http://' + devices[device_id].settings.ipaddress + ':' + devices[device_id].settings.port + '/' + command + '&token=' + devices[device_id].settings.token).then(function (result) {
+	if (typeof devices[device_id] ===  === "undefined") {
 		
-		Homey.log('Code: ' + result.response.statusCode);
-		Homey.log('Response: ' + result.data);
+		callback (null, false);
 		
-		result.data = JSON.parse (result.data);
-		
-		if (result.response.statusCode == 404) {
-			callback ('Invalid lock ID', false);
-		} else if (result.response.statusCode == 401) {
-			callback ('Invalid token', false);
-		} else if (result.response.statusCode == 200) {
-		
-			if (result.data.batteryCritical) Homey.manager('flow').triggerDevice('batteryCritical', {}, {device: device_id});
+	} else {
+	
+		http('http://' + devices[device_id].settings.ipaddress + ':' + devices[device_id].settings.port + '/' + command + '&token=' + devices[device_id].settings.token).then(function (result) {
 			
-			if (returndata) {
+			Homey.log('Code: ' + result.response.statusCode);
+			Homey.log('Response: ' + result.data);
+			
+			result.data = JSON.parse (result.data);
+			
+			if (result.response.statusCode == 404) {
+				callback ('Invalid lock ID', false);
+			} else if (result.response.statusCode == 401) {
+				callback ('Invalid token', false);
+			} else if (result.response.statusCode == 200) {
+			
+				if (result.data.batteryCritical) {
 				
-				callback (result.data);
+					var currentseconds = Math.round(new Date().getTime()/1000);
+					if ( (lastBatteryWarning + 24 * 60 * 60) < currentseconds) ) {
+
+						lastBatteryWarning = currentseconds;
+						Homey.manager('flow').triggerDevice('batteryCritical', {}, {device: device_id});
+					
+					}
+					
+				}
+				
+				
+				if (returndata) {
+					
+					callback (result.data);
+					
+				} else {
+					
+					//if (result.data.success) callback (null, true); else callback (null, false);
+					
+					if (result.data.success == true) {
+						Homey.log ('return true');
+						callback (null, true);
+						
+					} else {
+						Homey.log ('false: ' + JSON.stringify (result.data.success));
+						callback (null, false);
+					
+					}
+			
+				}
 				
 			} else {
 				
-				//if (result.data.success) callback (null, true); else callback (null, false);
-				
-				if (result.data.success == true) {
-					Homey.log ('return true');
-					callback (null, true);
-					
-				} else {
-					Homey.log ('false: ' + JSON.stringify (result.data.success));
-					callback (null, false);
-				
-				}
-		
+				callback ('Error code sendcommand: ' + result.response.statusCode, false);
+			
 			}
-			
-		} else {
-			
-			callback ('Error code sendcommand: ' + result.response.statusCode, false);
 		
-		}
-	
-	});
+		});
+		
+	}
 	
 }
 
 
 function polling(init) {
 	
-	if (init == 1) {
+	//if (init == 1) {
 	
 		//somehow the first time polling is called immediately, there are no devices yet.
-		setTimeout(polling, 5000);
+		//setTimeout(polling, 5000);
 		
-	} else {
-		setTimeout(polling, 30000);
+	//} else {
+		setTimeout(polling, 60000);
 		
 		Homey.log('_______________________________________________');
 		
@@ -349,7 +370,7 @@ function polling(init) {
 		
 		}
 		
-	}
+	//}
 
 }
 
