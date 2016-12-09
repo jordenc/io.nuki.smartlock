@@ -295,7 +295,7 @@ function polling(init) {
 		//setTimeout(polling, 5000);
 		
 	//} else {
-		setTimeout(polling, 20000);
+		setTimeout(polling, 30000);
 		
 		Homey.log('_______________________________________________');
 		

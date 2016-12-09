@@ -11,9 +11,9 @@
 			"saveSettings": "Gegevens opslaan"
 		}
 	},
-  	"unlock": "Openen",
+  	"unlock": "Ontgrendelen",
   	"lock": "Sluiten",
-  	"unlatch": "Ontgrendelen",
+  	"unlatch": "Openen",
   	"lockngo": "Automatisch vergrendelen",
-  	"lockngowithunlatch": "Automatisch vergrendelen en ontgrendelen"	
+  	"lockngowithunlatch": "Automatisch vergrendelen na openen"	
 }
