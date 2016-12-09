@@ -221,8 +221,9 @@ function sendcommand(device_id, command, returndata, callback) {
 	
 	Homey.log('sendcommand: ' + command);
 	
-	if (typeof devices[device_id] === "undefined") {
+	if (typeof devices[device_id] === "undefined" || typeof devices[device_id].settings === "undefined") {
 		
+		Homey.log ('Device not yet set, return false...');
 		callback (null, false);
 		
 	} else {
@@ -243,7 +244,7 @@ function sendcommand(device_id, command, returndata, callback) {
 				if (result.data.batteryCritical) {
 				
 					var currentseconds = Math.round(new Date().getTime()/1000);
-					if ( (lastBatteryWarning + 24 * 60 * 60) < currentseconds) ) {
+					if ( (lastBatteryWarning + 24 * 60 * 60) < currentseconds) {
 
 						lastBatteryWarning = currentseconds;
 						Homey.manager('flow').triggerDevice('batteryCritical', {}, {device: device_id});
@@ -294,7 +295,7 @@ function polling(init) {
 		//setTimeout(polling, 5000);
 		
 	//} else {
-		setTimeout(polling, 60000);
+		setTimeout(polling, 20000);
 		
 		Homey.log('_______________________________________________');
 		
@@ -307,20 +308,28 @@ function polling(init) {
 				//first initialisation, only save the status, don't trigger
 				if (typeof devices[device.id].state === "undefined") {
 					
-					Homey.log('device state was not yet set, now it is');
+					Homey.log('device state was not yet set, now trying to set');
 					
-					if (lockdata.stateName == "locked") {
+					if (lockdata === null || typeof lockdata.stateName === "undefined") {
 						
-						devices[device.id].state = {
-							locked: true
-						}
+						Homey.log ("Not yet initialised");
 						
 					} else {
 						
-						devices[device.id].state = {
-							locked: false
+						if (lockdata.stateName == "locked") {
+							
+							devices[device.id].state = {
+								locked: true
+							}
+							
+						} else {
+							
+							devices[device.id].state = {
+								locked: false
+							}
+	
 						}
-
+						
 					}
 					
 				} else {
