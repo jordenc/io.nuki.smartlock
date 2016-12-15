@@ -17,9 +17,12 @@ It could be that your Nuki app gets slower when Homey is polling. Since this is 
 
 **Want to show your appreciation for this app? A donation is possible via http://www.d2c.nl **
 
+**Version 0.1.4**
+- Polling made optional and changed to every 60 seconds to prevent battery drain
+
 **Version 0.1.3**
 - Bugfix which caused a crash on adding a device
-- Updated so a "Battery is critical" card only triggers once a day (untested)
+- Updated so a "Battery is critical" card only triggers once a day
 
 **Version 0.1.2**
 - Homey now keeps an eye on the lock(s) state, and can trigger when a lock gets (un)locked. 

@@ -4,7 +4,7 @@
         "en": "Nuki Smartlock",
         "nl": "Nuki Smartlock"
     },
-    "version": "0.1.3",
+    "version": "0.1.4",
     "compatibility": "0.x || 1.x",
     "author": {
         "name": "Chamid Media",
@@ -94,6 +94,15 @@
 	                            "nl": "Token"
 	                        },
 	                        "value": ""
+	                    },
+	                    {
+		                    "id": "enablepolling",
+		                    "type": "checkbox",
+		                    "label": {
+			                    "en": "Enable polling",
+			                    "nl": "Polling inschakelen"
+		                    },
+		                    "value": false
 	                    }
 	                ]
 	            }
