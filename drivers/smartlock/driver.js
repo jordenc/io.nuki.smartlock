@@ -289,105 +289,99 @@ function sendcommand(device_id, command, returndata, callback) {
 
 function polling(init) {
 	
-	//if (init == 1) {
+	setTimeout(polling, 60000);
 	
-		//somehow the first time polling is called immediately, there are no devices yet.
-		//setTimeout(polling, 5000);
+	Homey.log('_______________________________________________');
+	
+	for (var device_id in devices) {
 		
-	//} else {
-		setTimeout(polling, 60000);
+		var device = devices[device_id];
 		
-		Homey.log('_______________________________________________');
+		Homey.log('settings = ' + JSON.stringify(device));
 		
-		for (var device_id in devices) {
+		if (typeof device.settings !== "undefined" && device.settings.enablepolling) {
+		
+			sendcommand (device.id, 'lockState?nukiId=' + device.id, true, function (lockdata) {
 			
-			var device = devices[device_id];
-			
-			if (device.enablepolling) {
-			
-				sendcommand (device.id, 'lockState?nukiId=' + device.id, true, function (lockdata) {
-				
-					//first initialisation, only save the status, don't trigger
-					if (typeof devices[device.id].state === "undefined") {
+				//first initialisation, only save the status, don't trigger
+				if (typeof devices[device.id].state === "undefined") {
+					
+					Homey.log('device state was not yet set, now trying to set');
+					
+					if (lockdata === null || typeof lockdata.stateName === "undefined") {
 						
-						Homey.log('device state was not yet set, now trying to set');
+						Homey.log ("Not yet initialised");
 						
-						if (lockdata === null || typeof lockdata.stateName === "undefined") {
+					} else {
+						
+						if (lockdata.stateName == "locked") {
 							
-							Homey.log ("Not yet initialised");
+							devices[device.id].state = {
+								locked: true
+							}
 							
 						} else {
 							
-							if (lockdata.stateName == "locked") {
-								
-								devices[device.id].state = {
-									locked: true
-								}
-								
-							} else {
-								
-								devices[device.id].state = {
-									locked: false
-								}
-		
+							devices[device.id].state = {
+								locked: false
 							}
+	
+						}
+						
+					}
+					
+				} else {
+				
+					if (lockdata.stateName == "locked") {
+						
+						if (device.state.locked == false) {
+						
+							Homey.log('trigger LOCKED');
+							devices[device.id].state = {locked: true};
+							module.exports.realtime( device.device_data, "locked", true );
 							
+						
+						} else {
+							
+							Homey.log('device was already locked, do not trigger');
+							
+						}
+						
+					} else if (lockdata.stateName == "unlocked") {
+		
+						if (device.state.locked == true) {
+						
+							Homey.log('trigger UNLOCKED');
+							devices[device.id].state = {locked: false}
+							module.exports.realtime( device.device_data, "locked", false );
+							
+							
+						} else {
+							
+							Homey.log('device was already unlocked, do not trigger');
+						
 						}
 						
 					} else {
-					
-						if (lockdata.stateName == "locked") {
-							
-							if (device.state.locked == false) {
-							
-								Homey.log('trigger LOCKED');
-								devices[device.id].state = {locked: true};
-								module.exports.realtime( device.device_data, "locked", true );
-								
-							
-							} else {
-								
-								Homey.log('device was already locked, do not trigger');
-								
-							}
-							
-						} else if (lockdata.stateName == "unlocked") {
-			
-							if (device.state.locked == true) {
-							
-								Homey.log('trigger UNLOCKED');
-								devices[device.id].state = {locked: false}
-								module.exports.realtime( device.device_data, "locked", false );
-								
-								
-							} else {
-								
-								Homey.log('device was already unlocked, do not trigger');
-							
-							}
-							
-						} else {
-							
-							Homey.log ('data.stateName was not locked or unlocked, but: ' + lockdata.stateName);	
-							
-						}
 						
-						//Homey.log('done polling');
-						
+						Homey.log ('data.stateName was not locked or unlocked, but: ' + lockdata.stateName);	
 						
 					}
-								
-				});
-				
-			} else {
-				
-				Homey.log ('Polling not enabled for device ' + device.id);
-				
-			}
-		
+					
+					//Homey.log('done polling');
+					
+					
+				}
+							
+			});
+			
+		} else {
+			
+			Homey.log ('Polling not enabled for device ' + device.id + ', or device settings not yet loaded');
+			
 		}
-		
-	//}
+	
+	}
 
 }
 
