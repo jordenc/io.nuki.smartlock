@@ -31,6 +31,21 @@ module.exports.init = function(devices_data, callback) {
 	    
 	    module.exports.getSettings(device, function(err, settings){
 		    devices[device.id].settings = settings;
+		    
+		    //check (using settings var) if callback is set => http://192.168.1.123:8080/callback/list?token=12345aaa
+		    //if not:
+		    //http://192.168.1.123:8080/callback/add?url=http:// urlencoded url http%3A%2F%2F (no https) &token=12345aaa
+		    //https://webhooks.athom.com/webhook/58ac8804762127890d66f9e5/
+		    //Homey.env.CLIENT_ID
+            // Register initial webhook
+            /*
+                if (Homey.env.CLIENT_ID && Homey.env.CLIENT_SECRET) {
+
+                        // Register webhook
+                        self.registerWebhook(Homey.env.CLIENT_ID, Homey.env.CLIENT_SECRET);
+
+                }
+            */
 		});
 		
 		devices[device.id].device_data = device;
