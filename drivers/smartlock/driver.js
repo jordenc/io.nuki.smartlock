@@ -4,6 +4,8 @@ var http = require('http.min');
 var devices = {};
 var tempIP, tempPort, tempToken, lastBatteryWarning;
 
+var Homey_ip;
+
 module.exports.settings = function( device_data, newSettingsObj, oldSettingsObj, changedKeysArr, callback ) {
 
     Homey.log ('Changed settings: ' + JSON.stringify(device_data) + ' / ' + JSON.stringify(newSettingsObj) + ' / old = ' + JSON.stringify(oldSettingsObj));
@@ -21,10 +23,26 @@ module.exports.settings = function( device_data, newSettingsObj, oldSettingsObj,
 
 
 module.exports.init = function(devices_data, callback) {
-    
+	
+	var os = require('os');
+
+	var interfaces = os.networkInterfaces();
+	var addresses = [];
+	for (var k in interfaces) {
+	    for (var k2 in interfaces[k]) {
+	        var address = interfaces[k][k2];
+	        if (address.family === 'IPv4' && !address.internal) {
+	            addresses.push(address.address);
+	        }
+	    }
+	}
+	
     devices_data.forEach(function initdevice(device) {
-	    
+	
+		var url = 'http://' + addresses + '/api/app/io.nuki.smartlock/webhook';
 	    Homey.log('add device: ' + JSON.stringify(device));
+	    
+	    Homey.log('webhook URL=' + url);
 	    
 	    //devices[device.id] = device;
 	    devices[device.id] = Object.assign({}, device);
