@@ -8,6 +8,8 @@ module.exports = [
         fn: function( callback, args ){
 	        
 	        Homey.log('received webhook call in api.js');
+	        
+	        Homey.log (JSON.stringify (args));
             //var result = Homey.app.getSomething();
 
             // callback follows ( err, result )
