@@ -18,6 +18,13 @@ module.exports = [
 		    */
             //var result = Homey.app.getSomething();
 
+			var tokens = { 'lockstate': args.body.stateName };
+			var state = {};
+
+			Homey.manager('flow').triggerDevice( 'lockstate', tokens, state, device_data, function(err, result){
+			    if( err ) return Homey.error(err);
+			});
+
             // callback follows ( err, result )
             //callback( null, result );
             callback (null, true);
