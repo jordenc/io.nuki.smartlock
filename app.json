@@ -128,6 +128,24 @@
 	                "filter": "driver_id=smartlock"
 	            }
 	            ]
+	        },
+	        {
+		    	"id": "lockstate",
+				"title": {
+					"en": "Lockstate changes",
+					"nl": "Status wijzigt"
+				},
+	            "args": [
+	            {
+	                "name": "device",
+	                "type": "device",
+	                "placeholder": {
+	                  "en": "Select smartlock",
+	                  "nl": "Selecteer smartlock"
+	                },
+	                "filter": "driver_id=smartlock"
+	            }
+	            ]
 	        }
 	    ],
 	    "conditions": [
