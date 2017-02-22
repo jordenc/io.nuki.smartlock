@@ -2,7 +2,7 @@
 
 var http = require('http.min');
 var devices = {};
-var tempIP, tempPort, tempToken, lastBatteryWarning;
+var tempIP, tempPort, tempToken, lastBatteryWarning, url, callback_url_set;
 
 module.exports.settings = function( device_data, newSettingsObj, oldSettingsObj, changedKeysArr, callback ) {
 
@@ -27,10 +27,12 @@ module.exports.init = function(devices_data, callback) {
 	    function callback(err, ip)
 	);
 	*/
+	callback_url_set = false;
 	
 	Homey.manager('cloud').getLocalAddress(function (err, ip) {
 		
-		var url = 'http://' + ip + '/api/app/io.nuki.smartlock/webhook';
+		url = 'http://' + ip + '/api/app/io.nuki.smartlock/webhook';
+		Homey.log('webhook URL=' + url);
 		
 	});
 		
@@ -38,37 +40,11 @@ module.exports.init = function(devices_data, callback) {
 	
 	    Homey.log('add device: ' + JSON.stringify(device));
 	    
-	    Homey.log('webhook URL=' + url);
-	    
 	    //devices[device.id] = device;
 	    devices[device.id] = Object.assign({}, device);
 	    
 	    module.exports.getSettings(device, function(err, settings){
 		    devices[device.id].settings = settings;
-		    
-		    //check (using settings var) if callback is set => http://192.168.1.123:8080/callback/list?token=12345aaa
-		    
-		    /*
-		    sendcommand (device.id, 'callback/list', true, function (data) {
-		
-				if (data.stateName == "locked") callback (null, true); else callback (null, false);
-				
-			});
-			*/
-			
-		    //if not:
-		    //http://192.168.1.123:8080/callback/add?url=http:// urlencoded url http%3A%2F%2F (no https) &token=12345aaa
-		    //https://webhooks.athom.com/webhook/58ac8804762127890d66f9e5/
-		    //Homey.env.CLIENT_ID
-            // Register initial webhook
-            /*
-                if (Homey.env.CLIENT_ID && Homey.env.CLIENT_SECRET) {
-
-                        // Register webhook
-                        self.registerWebhook(Homey.env.CLIENT_ID, Homey.env.CLIENT_SECRET);
-
-                }
-            */
 		});
 		
 		devices[device.id].device_data = device;
@@ -329,7 +305,8 @@ function sendcommand(device_id, command, returndata, callback) {
 
 function polling(init) {
 	
-	setTimeout(polling, 60000);
+	if (callback_url_set == true) return true;
+	setTimeout(polling, 30000);
 	
 	Homey.log('_______________________________________________');
 	
@@ -339,6 +316,67 @@ function polling(init) {
 		
 		Homey.log('settings = ' + JSON.stringify(device));
 		
+		//Is the callback URL already set?
+	    sendcommand (device.id, 'callback/list', true, function (data) {
+			
+			if (JSON.stringify(data) == "null") {
+				
+				Homey.log('callback/list: device not yet ready');
+			
+			} else if (JSON.stringify(data) === "null") {
+				
+				Homey.log('callback/list: device not yet ready2');
+				
+			} else {
+				
+				if (typeof data.callbacks === "undefined") {
+					
+					Homey.log ('Undefined data.callbacks');
+					
+				} else {
+					
+					for (var url_id = 0; url_id < 3; url_id++) {
+						
+						Homey.log ('=== ' + url_id + ' ===');
+						
+						if (typeof data.callbacks[url_id] === "undefined" && callback_url_set == false) {
+							
+							Homey.log ('callback ' + url_id + ' is undefined so that is where we are going to put it');
+							callback_url_set = true;
+							
+							sendcommand (device.id, 'callback/add?url=' + url, true, function (data) {
+								
+								Homey.log ('callback/add data=' + JSON.stringify (data));
+								
+							});
+							
+						} else {
+							
+							if (data.callbacks[url_id].url == url) {
+								
+								Homey.log ('callback ' + url_id + ' is set to the right URL');
+								
+								callback_url_set = true;
+								
+							} else {
+								
+								Homey.log ('callback ' + url_id + ' is NOT set to the right URL');
+								
+							}
+							
+						}
+					
+					}
+					
+				}
+								
+				Homey.log('callback/list info=' + JSON.stringify (data));
+			}
+					
+		});
+			
+			
+			
 		if (typeof device.settings !== "undefined" && device.settings.enablepolling) {
 		
 			sendcommand (device.id, 'lockState?nukiId=' + device.id, true, function (lockdata) {

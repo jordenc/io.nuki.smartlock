@@ -10,6 +10,12 @@ module.exports = [
 	        Homey.log('received webhook call in api.js');
 	        
 	        Homey.log (JSON.stringify (args));
+	        
+	        /*
+		        
+		        {"params":{},"body":{"nukiId":93786865,"state":1,"stateName":"locked","batteryCritical":false},"query":{},"files":{},"req":{"remoteAddress":"::ffff:192.168.1.170"}}
+		        
+		    */
             //var result = Homey.app.getSomething();
 
             // callback follows ( err, result )
