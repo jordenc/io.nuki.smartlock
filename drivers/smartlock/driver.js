@@ -47,6 +47,15 @@ module.exports.init = function(devices_data, callback) {
 		    devices[device.id].settings = settings;
 		    
 		    //check (using settings var) if callback is set => http://192.168.1.123:8080/callback/list?token=12345aaa
+		    
+		    /*
+		    sendcommand (device.id, 'callback/list', true, function (data) {
+		
+				if (data.stateName == "locked") callback (null, true); else callback (null, false);
+				
+			});
+			*/
+			
 		    //if not:
 		    //http://192.168.1.123:8080/callback/add?url=http:// urlencoded url http%3A%2F%2F (no https) &token=12345aaa
 		    //https://webhooks.athom.com/webhook/58ac8804762127890d66f9e5/

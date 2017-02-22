@@ -133,8 +133,19 @@
 		    	"id": "lockstate",
 				"title": {
 					"en": "Lockstate changes",
-					"nl": "Status wijzigt"
+					"nl": "Vergrendeltatus wijzigt"
 				},
+				"tokens": [
+                {
+                    "name": "lockstate",
+                    "type": "string",
+                    "title": {
+                        "en": "Lockstate",
+                        "nl": "Vergrendelstatus"
+                    },
+                    "example": "Locked"
+                }
+                ],
 	            "args": [
 	            {
 	                "name": "device",
