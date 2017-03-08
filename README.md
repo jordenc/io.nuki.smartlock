@@ -10,17 +10,15 @@ Provides the following cards:
 - [ACTION] Set state: Locked, Unlocked, Unlatch, Lock 'n go, Lock 'n go with unlatch
 - [TRIGGER] Smartlock got locked
 - [TRIGGER] Smartlock got unlocked
+- [TRIGGER] Smartlock lockstate changes
 - [TRIGGER] Battery is critical
 
 **Make sure to give your Nuki lock a static IP!**
 
-The application keeps polling the lock every 60 seconds. So it should take a maximum of approximately 65 seconds before Homey gets triggered (polling the bridge takes a few seconds).
-It could be that your Nuki app gets slower when Homey is polling. Since this is still an early version, we will see what happens.
-
 **Want to show your appreciation for this app? A donation is possible via http://www.d2c.nl **
 
 **Version 0.1.5**
-- 
+- App now no longer uses polling to check lockstate, but instead sets a Webhook URL. *Make sure to set a static IP for your Homey as well*
 
 **Version 0.1.4**
 - Polling made optional (off by default) and changed to every 60 seconds to prevent battery drain

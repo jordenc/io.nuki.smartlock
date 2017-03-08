@@ -94,15 +94,6 @@
 	                            "nl": "Token"
 	                        },
 	                        "value": ""
-	                    },
-	                    {
-		                    "id": "enablepolling",
-		                    "type": "checkbox",
-		                    "label": {
-			                    "en": "Enable polling",
-			                    "nl": "Polling inschakelen"
-		                    },
-		                    "value": false
 	                    }
 	                ]
 	            }

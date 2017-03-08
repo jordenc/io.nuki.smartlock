@@ -19,6 +19,12 @@ module.exports.settings = function( device_data, newSettingsObj, oldSettingsObj,
 
 };
 
+//returns the devices to api.js / external devices
+module.exports.getDevices = function() {
+
+	return devices;
+	
+}
 
 module.exports.init = function(devices_data, callback) {
 	
@@ -377,7 +383,7 @@ function polling(init) {
 			
 			
 			
-		if (typeof device.settings !== "undefined" && device.settings.enablepolling) {
+		if (typeof device.settings !== "undefined") {
 		
 			sendcommand (device.id, 'lockState?nukiId=' + device.id, true, function (lockdata) {
 			

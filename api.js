@@ -20,8 +20,12 @@ module.exports = [
 
 			var tokens = { 'lockstate': args.body.stateName };
 			var state = {};
+			
+			var devices = Homey.manager("drivers").getDriver("smartlock").getDevices();
+			
+			Homey.log('---devices---' + JSON.stringify (devices));
 
-			Homey.manager('flow').triggerDevice( 'lockstate', tokens, state, device_data, function(err, result){
+			Homey.manager('flow').triggerDevice( 'lockstate', tokens, state, devices[args.body.nukiId].device_data, function(err, result){
 			    if( err ) return Homey.error(err);
 			});
 
