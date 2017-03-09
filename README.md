@@ -17,6 +17,9 @@ Provides the following cards:
 
 **Want to show your appreciation for this app? A donation is possible via http://www.d2c.nl **
 
+**Version 0.1.6**
+- Small internal changes (Thanks BasKiers!)
+
 **Version 0.1.5**
 - App now no longer uses polling to check lockstate, but instead sets a Webhook URL. *Make sure to set a static IP for your Homey as well*
 
