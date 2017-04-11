@@ -33,7 +33,6 @@ module.exports.init = function(devices_data, callback) {
 	    function callback(err, ip)
 	);
 	*/
-	callback_url_set = false;
 	
 	Homey.manager('cloud').getLocalAddress(function (err, ip) {
 		
@@ -63,7 +62,8 @@ module.exports.init = function(devices_data, callback) {
 	
 	
 	
-	setTimeout(polling(1), 60000);
+	//setTimeout(polling(1), 60000);
+	setTimeout(polling.bind(null, 1), 60000);
 	
 	callback (null, true);
 };
@@ -311,7 +311,6 @@ function sendcommand(device_id, command, returndata, callback) {
 
 function polling(init) {
 	
-	if (callback_url_set == true) return true;
 	setTimeout(polling, 30000);
 	
 	Homey.log('_______________________________________________');
@@ -320,63 +319,78 @@ function polling(init) {
 		
 		var device = devices[device_id];
 		
-		Homey.log('settings = ' + JSON.stringify(device));
-		
-		//Is the callback URL already set?
-	    sendcommand (device.id, 'callback/list', true, function (data) {
+		if (device.callback_url_set != true) {
 			
-			if (JSON.stringify(data) == "null") {
-				
-				Homey.log('callback/list: device not yet ready');
+			Homey.log('settings = ' + JSON.stringify(device));
 			
-			} else if (JSON.stringify(data) === "null") {
+			//Is the callback URL already set?
+		    sendcommand (device.id, 'callback/list', true, function (data) {
 				
-				Homey.log('callback/list: device not yet ready2');
-				
-			} else {
-				
-				if (typeof data.callbacks === "undefined") {
+				if (JSON.stringify(data) == "null") {
 					
-					Homey.log ('Undefined data.callbacks');
+					Homey.log('callback/list: device not yet ready');
+				
+				} else if (JSON.stringify(data) === "null") {
+					
+					Homey.log('callback/list: device not yet ready2');
 					
 				} else {
 					
-					for (var url_id = 0; url_id < 3; url_id++) {
+					if (typeof data.callbacks === "undefined") {
 						
-						Homey.log ('=== ' + url_id + ' ===');
+						Homey.log ('Undefined data.callbacks');
 						
-						if (typeof data.callbacks[url_id] === "undefined" && callback_url_set == false) {
+					} else {
+						
+						var foundUrl = false, var emptyUrlId = -1;
+						
+						for (var url_id = 0; url_id < 3; url_id++) {
 							
-							Homey.log ('callback ' + url_id + ' is undefined so that is where we are going to put it');
-							callback_url_set = true;
-							
-							sendcommand (device.id, 'callback/add?url=' + url, true, function (data) {
-								
-								Homey.log ('callback/add data=' + JSON.stringify (data));
-								
-							});
-							
-						} else {
-							
-							if (data.callbacks[url_id].url == url) {
-								
-								Homey.log ('callback ' + url_id + ' is set to the right URL');
-								
-								callback_url_set = true;
-								
-							} else {
-								
-								Homey.log ('callback ' + url_id + ' is NOT set to the right URL');
-								
-							}
-							
+						    Homey.log('=== ' + url_id + ' ===');
+						
+						    if (data.callbacks[url_id].url === url) {
+						    
+						        foundUrl = true;
+						        break;
+						    
+						    } else if (emptyUrlId !== -1 && data.callbacks[url_id].url === undefined) {
+						    
+						        emptyUrlId = url_id;
+						    
+						    }
+						
 						}
-					
+						
+						
+						if(!foundUrl) {
+						    
+						    if (emptyUrlId !== -1) {
+						        
+						        device.callback_url_set = true;
+						        
+						        sendcommand(device.id, 'callback/add?url=' + url, true, function (data) {
+						
+						            Homey.log('callback/add data=' + JSON.stringify(data));
+						
+						        });
+						    
+						    } else {
+						        
+						        Homey.log('callback ' + url_id + ' is NOT set to the right URL');
+						    
+						    }
+						
+						} else {
+						    
+						    device.callback_url_set = true;
+						
+						}
+						
 					}
-					
+									
+					Homey.log('callback/list info=' + JSON.stringify (data));
 				}
-								
-				Homey.log('callback/list info=' + JSON.stringify (data));
+				
 			}
 					
 		});
