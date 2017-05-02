@@ -309,7 +309,9 @@ function sendcommand(device_id, command, returndata, callback) {
 }
 
 
+
 function polling(init) {
+	
 	
 	setTimeout(polling, 30000);
 	
@@ -319,6 +321,7 @@ function polling(init) {
 		
 		var device = devices[device_id];
 		
+		
 		if (device.callback_url_set != true) {
 			
 			Homey.log('settings = ' + JSON.stringify(device));
@@ -326,6 +329,8 @@ function polling(init) {
 			//Is the callback URL already set?
 		    sendcommand (device.id, 'callback/list', true, function (data) {
 				
+				
+			
 				if (JSON.stringify(data) == "null") {
 					
 					Homey.log('callback/list: device not yet ready');
@@ -336,13 +341,14 @@ function polling(init) {
 					
 				} else {
 					
+					
 					if (typeof data.callbacks === "undefined") {
 						
 						Homey.log ('Undefined data.callbacks');
 						
 					} else {
 						
-						var foundUrl = false, var emptyUrlId = -1;
+						var foundUrl = false, emptyUrlId = -1;
 						
 						for (var url_id = 0; url_id < 3; url_id++) {
 							
@@ -389,14 +395,15 @@ function polling(init) {
 					}
 									
 					Homey.log('callback/list info=' + JSON.stringify (data));
-				}
-				
-			}
 					
-		});
+				}	
+				
+			});
+				
+		}
+		
 			
-			
-			
+		
 		if (typeof device.settings !== "undefined") {
 		
 			sendcommand (device.id, 'lockState?nukiId=' + device.id, true, function (lockdata) {
@@ -480,7 +487,7 @@ function polling(init) {
 		}
 	
 	}
-
+	
 }
 
 function searchForActions (value) {
