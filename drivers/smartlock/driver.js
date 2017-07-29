@@ -307,10 +307,14 @@ function polling(init) {
 	for (var device_id in devices) {
 		
 		var device = devices[device_id];
-		
+
 		if (device.callback_url_set != true) {
 			
-			if (!device.foundUrl) {
+			Homey.log ('callback_url_set is not true');
+			
+			if (!device.foundUrl && device.scanned == true) {
+				
+				Homey.log ('foundUrl is not true');
 						    
 				if (device.emptyUrlId !== -1) {
 					
@@ -333,7 +337,7 @@ function polling(init) {
 			    device.callback_url_set = true;
 			
 			}
-						
+
 			Homey.log('settings = ' + JSON.stringify(device));
 			
 			//Is the callback URL already set?
@@ -357,6 +361,7 @@ function polling(init) {
 						
 					} else {
 						
+						device.scanned = true;
 						device.foundUrl = false;
 						device.emptyUrlId = -1;
 						
@@ -387,90 +392,6 @@ function polling(init) {
 				
 		}
 		
-		/*
-		
-		if (typeof device.settings !== "undefined") {
-		
-			sendcommand (device.id, 'lockState?nukiId=' + device.id, true, function (lockdata) {
-			
-				//first initialisation, only save the status, don't trigger
-				if (typeof devices[device.id] === "undefined" || (typeof devices[device.id] !== "undefined" && devices[device.id].state === "undefined")) {
-					
-					Homey.log('device state was not yet set, now trying to set');
-					
-					if (lockdata === null || typeof lockdata.stateName === "undefined") {
-						
-						Homey.log ("Not yet initialised");
-						
-					} else {
-						
-						if (lockdata.stateName == "locked") {
-							
-							devices[device.id].state = {
-								locked: true
-							}
-							
-						} else {
-							
-							devices[device.id].state = {
-								locked: false
-							}
-	
-						}
-						
-					}
-					
-				} else {
-				
-					if (lockdata.stateName == "locked") {
-						
-						if (device.state.locked == false) {
-						
-							Homey.log('trigger LOCKED');
-							devices[device.id].state = {locked: true};
-							module.exports.realtime( device.device_data, "locked", true );
-							
-						
-						} else {
-							
-							Homey.log('device was already locked, do not trigger');
-							
-						}
-						
-					} else if (lockdata.stateName == "unlocked") {
-		
-						if (device.state.locked == true) {
-						
-							Homey.log('trigger UNLOCKED');
-							devices[device.id].state = {locked: false}
-							module.exports.realtime( device.device_data, "locked", false );
-							
-							
-						} else {
-							
-							Homey.log('device was already unlocked, do not trigger');
-						
-						}
-						
-					} else {
-						
-						Homey.log ('data.stateName was not locked or unlocked, but: ' + lockdata.stateName);	
-						
-					}
-					
-					//Homey.log('done polling');
-					
-					
-				}
-							
-			});
-			
-		} else {
-			
-			Homey.log ('Polling not enabled for device ' + device.id + ', or device settings not yet loaded');
-			
-		}
-		*/
 	}
 	
 }

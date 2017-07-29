@@ -17,6 +17,8 @@ Provides the following cards:
 
 **Want to show your appreciation for this app? A donation is possible via http://www.d2c.nl **
 
+**Version 0.1.9**
+- Fixed a bug that keeps on adding the Homey webhook URL to the Nuki bridge.
 
 **Version 0.1.8**
 - Fixed a bug that might cause the Nuki app to crash after adding your first lock.
