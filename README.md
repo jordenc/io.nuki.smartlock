@@ -16,6 +16,9 @@ Provides the following cards:
 **Make sure to give your Nuki lock a static IP!**
 
 **Want to show your appreciation for this app? A donation is possible via http://www.d2c.nl **
+**Version 0.2.0**
+- Fixed a bug in Homey software 1.5.0+
+- Homey now displays the realtime lockstate correctly
 
 **Version 0.1.9**
 - Fixed a bug that keeps on adding the Homey webhook URL to the Nuki bridge.

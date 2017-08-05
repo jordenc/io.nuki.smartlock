@@ -18,10 +18,17 @@ module.exports = [
 			
 			Homey.log('---devices---' + JSON.stringify (devices));
 
+			var isLocked = false;
+			
+			if (args.body.stateName == 'Locked') isLocked = true;
 			//Check if device still exists:
 			if (typeof devices[args.body.nukiId] !== 'undefined') {
 				
-				Homey.manager('flow').triggerDevice( 'lockstate', tokens, state, devices[args.body.nukiId].device_data, function(err, result){
+				//Update state in Homey via realtime
+				Homey.manager("drivers").getDriver("smartlock").realtimeUpdate(devices[args.body.nukiId].device_data, isLocked, args.body.nukiId);
+				
+				//Activate trigger
+				Homey.manager('flow').triggerDevice( 'lockstate', tokens, isLocked, devices[args.body.nukiId].device_data, function(err, result){
 				    if( err ) return Homey.error(err);
 				});
 				

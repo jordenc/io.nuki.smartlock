@@ -26,6 +26,12 @@ module.exports.getDevices = function() {
 	
 }
 
+module.exports.realtimeUpdate = function(device_data, isLocked) {
+	
+	module.exports.realtime(device_data, "locked", isLocked);
+	
+}
+
 module.exports.init = function(devices_data, callback) {
 	
 	Homey.manager('cloud').getLocalAddress(function (err, ip) {
@@ -54,7 +60,9 @@ module.exports.init = function(devices_data, callback) {
 	
 	Homey.log("Nuki app - init done");
 	
-	setTimeout(polling.bind(null, 1), 10000);
+	setTimeout(function() {
+		polling.bind(null, 1)
+	}, 10000);
 	
 	callback (null, true);
 };
@@ -300,7 +308,7 @@ function sendcommand(device_id, command, returndata, callback) {
 
 function polling(init) {
 	
-	setTimeout(polling, 10000);
+	setTimeout(function() {polling}, 10000);
 	
 	Homey.log('_______________________________________________');
 	
