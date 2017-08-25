@@ -4,7 +4,7 @@
         "en": "Nuki Smartlock",
         "nl": "Nuki Smartlock"
     },
-    "version": "0.1.7",
+    "version": "0.1.8",
     "compatibility": "0.x || 1.x",
     "author": {
         "name": "Chamid Media",
@@ -124,7 +124,7 @@
 		    	"id": "lockstate",
 				"title": {
 					"en": "Lockstate changes",
-					"nl": "Vergrendeltatus wijzigt"
+					"nl": "Vergrendelstatus wijzigt"
 				},
 				"tokens": [
                 {

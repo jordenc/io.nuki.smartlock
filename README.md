@@ -17,6 +17,9 @@ Provides the following cards:
 
 **Want to show your appreciation for this app? A donation is possible via http://www.d2c.nl **
 
+**Version 0.1.8**
+- Typofix
+
 **Version 0.1.7**
 - Bugfix
 
