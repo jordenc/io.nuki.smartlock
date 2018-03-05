@@ -2,7 +2,7 @@
 
 var http = require('http.min');
 var devices = {};
-var tempIP, tempPort, tempToken, lastBatteryWarning, url, callback_url_set;
+var tempIP, tempPort, tempToken, lastBatteryWarning, url;
 
 module.exports.settings = function( device_data, newSettingsObj, oldSettingsObj, changedKeysArr, callback ) {
 
@@ -26,13 +26,13 @@ module.exports.getDevices = function() {
 	
 }
 
-module.exports.init = function(devices_data, callback) {
+module.exports.realtimeUpdate = function(device_data, isLocked) {
 	
-	/*
-	Homey.manager('cloud').getLocalAddress( 
-	    function callback(err, ip)
-	);
-	*/
+	module.exports.realtime(device_data, "locked", isLocked);
+	
+}
+
+module.exports.init = function(devices_data, callback) {
 	
 	Homey.manager('cloud').getLocalAddress(function (err, ip) {
 		
@@ -60,10 +60,9 @@ module.exports.init = function(devices_data, callback) {
 	
 	Homey.log("Nuki app - init done");
 	
-	
-	
-	//setTimeout(polling(1), 60000);
-	setTimeout(polling.bind(null, 1), 60000);
+	setTimeout(function() {
+		polling.bind(null, 1)
+	}, 10000);
 	
 	callback (null, true);
 };
@@ -252,8 +251,8 @@ function sendcommand(device_id, command, returndata, callback) {
 	
 		http('http://' + devices[device_id].settings.ipaddress + ':' + devices[device_id].settings.port + '/' + command + '&token=' + devices[device_id].settings.token).then(function (result) {
 			
-			Homey.log('Code: ' + result.response.statusCode);
-			Homey.log('Response: ' + result.data);
+			Homey.log('[' + command +'] Code: ' + result.response.statusCode);
+			Homey.log('[' + command +'] Response: ' + result.data);
 			
 			result.data = JSON.parse (result.data);
 			
@@ -275,14 +274,11 @@ function sendcommand(device_id, command, returndata, callback) {
 					
 				}
 				
-				
 				if (returndata) {
 					
 					callback (result.data);
 					
 				} else {
-					
-					//if (result.data.success) callback (null, true); else callback (null, false);
 					
 					if (result.data.success == true) {
 						Homey.log ('return true');
@@ -312,25 +308,49 @@ function sendcommand(device_id, command, returndata, callback) {
 
 function polling(init) {
 	
-	
-	setTimeout(polling, 30000);
+	setTimeout(function() {polling}, 10000);
 	
 	Homey.log('_______________________________________________');
 	
 	for (var device_id in devices) {
 		
 		var device = devices[device_id];
-		
-		
+
 		if (device.callback_url_set != true) {
 			
+			Homey.log ('callback_url_set is not true');
+			
+			if (!device.foundUrl && device.scanned == true) {
+				
+				Homey.log ('foundUrl is not true');
+						    
+				if (device.emptyUrlId !== -1) {
+					
+					device.callback_url_set = true;
+						        
+					sendcommand(device.id, 'callback/add?url=' + url, true, function (data) {
+						
+						Homey.log('callback/add data=' + JSON.stringify(data));
+						
+			        });
+			    
+			    } else {
+			        
+			        Homey.log('callback ' + url_id + ' is NOT set to the right URL');
+			    
+			    }
+			
+			} else {
+			    
+			    device.callback_url_set = true;
+			
+			}
+
 			Homey.log('settings = ' + JSON.stringify(device));
 			
 			//Is the callback URL already set?
 		    sendcommand (device.id, 'callback/list', true, function (data) {
 				
-				
-			
 				if (JSON.stringify(data) == "null") {
 					
 					Homey.log('callback/list: device not yet ready');
@@ -341,6 +361,7 @@ function polling(init) {
 					
 				} else {
 					
+					Homey.log('device is ready, check for callback url');
 					
 					if (typeof data.callbacks === "undefined") {
 						
@@ -348,7 +369,9 @@ function polling(init) {
 						
 					} else {
 						
-						var foundUrl = false, emptyUrlId = -1;
+						device.scanned = true;
+						device.foundUrl = false;
+						device.emptyUrlId = -1;
 						
 						for (var url_id = 0; url_id < 3; url_id++) {
 							
@@ -356,39 +379,14 @@ function polling(init) {
 						
 						    if (data.callbacks[url_id].url === url) {
 						    
-						        foundUrl = true;
+						        device.foundUrl = true;
 						        break;
 						    
-						    } else if (emptyUrlId !== -1 && data.callbacks[url_id].url === undefined) {
+						    } else if (device.emptyUrlId !== -1 && data.callbacks[url_id].url === undefined) {
 						    
-						        emptyUrlId = url_id;
-						    
-						    }
-						
-						}
-						
-						
-						if(!foundUrl) {
-						    
-						    if (emptyUrlId !== -1) {
-						        
-						        device.callback_url_set = true;
-						        
-						        sendcommand(device.id, 'callback/add?url=' + url, true, function (data) {
-						
-						            Homey.log('callback/add data=' + JSON.stringify(data));
-						
-						        });
-						    
-						    } else {
-						        
-						        Homey.log('callback ' + url_id + ' is NOT set to the right URL');
+						        device.emptyUrlId = url_id;
 						    
 						    }
-						
-						} else {
-						    
-						    device.callback_url_set = true;
 						
 						}
 						
@@ -402,90 +400,6 @@ function polling(init) {
 				
 		}
 		
-			
-		
-		if (typeof device.settings !== "undefined") {
-		
-			sendcommand (device.id, 'lockState?nukiId=' + device.id, true, function (lockdata) {
-			
-				//first initialisation, only save the status, don't trigger
-				if (typeof devices[device.id].state === "undefined") {
-					
-					Homey.log('device state was not yet set, now trying to set');
-					
-					if (lockdata === null || typeof lockdata.stateName === "undefined") {
-						
-						Homey.log ("Not yet initialised");
-						
-					} else {
-						
-						if (lockdata.stateName == "locked") {
-							
-							devices[device.id].state = {
-								locked: true
-							}
-							
-						} else {
-							
-							devices[device.id].state = {
-								locked: false
-							}
-	
-						}
-						
-					}
-					
-				} else {
-				
-					if (lockdata.stateName == "locked") {
-						
-						if (device.state.locked == false) {
-						
-							Homey.log('trigger LOCKED');
-							devices[device.id].state = {locked: true};
-							module.exports.realtime( device.device_data, "locked", true );
-							
-						
-						} else {
-							
-							Homey.log('device was already locked, do not trigger');
-							
-						}
-						
-					} else if (lockdata.stateName == "unlocked") {
-		
-						if (device.state.locked == true) {
-						
-							Homey.log('trigger UNLOCKED');
-							devices[device.id].state = {locked: false}
-							module.exports.realtime( device.device_data, "locked", false );
-							
-							
-						} else {
-							
-							Homey.log('device was already unlocked, do not trigger');
-						
-						}
-						
-					} else {
-						
-						Homey.log ('data.stateName was not locked or unlocked, but: ' + lockdata.stateName);	
-						
-					}
-					
-					//Homey.log('done polling');
-					
-					
-				}
-							
-			});
-			
-		} else {
-			
-			Homey.log ('Polling not enabled for device ' + device.id + ', or device settings not yet loaded');
-			
-		}
-	
 	}
 	
 }
