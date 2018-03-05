@@ -124,7 +124,7 @@
 		    	"id": "lockstate",
 				"title": {
 					"en": "Lockstate changes",
-					"nl": "Vergrendeltatus wijzigt"
+					"nl": "Vergrendelstatus wijzigt"
 				},
 				"tokens": [
                 {

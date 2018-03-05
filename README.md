@@ -27,6 +27,9 @@ Provides the following cards:
 - Fixed a bug that might cause the Nuki app to crash after adding your first lock.
 - Fixed a bug that caused the URL of the webhook not being set into the Nuki bridge, therefor it was impossible to get triggered after lockstate changes
 
+**Version 0.1.8**
+- Typofix
+
 **Version 0.1.7**
 - Bugfix
 
