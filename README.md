@@ -15,7 +15,9 @@ Provides the following cards:
 
 **Make sure to give your Nuki lock AND Homey a static IP!**
 
-**Want to show your appreciation for this app? A donation is possible via http://www.d2c.nl **
+Want to show your appreciation for this app? A donation is possible via http://www.d2c.nl
+
+
 
 **Version 0.2.1**
 - Typo fixed
