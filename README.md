@@ -13,9 +13,13 @@ Provides the following cards:
 - [TRIGGER] Smartlock lockstate changes
 - [TRIGGER] Battery is critical
 
-**Make sure to give your Nuki lock a static IP!**
+**Make sure to give your Nuki lock AND Homey a static IP!**
 
 **Want to show your appreciation for this app? A donation is possible via http://www.d2c.nl **
+**Version 0.2.1**
+- Typo fixed
+- Updated Readme to instruct to give Homey a static IP as well
+
 **Version 0.2.0**
 - Fixed a bug in Homey software 1.5.0+
 - Homey now displays the realtime lockstate correctly
@@ -26,9 +30,6 @@ Provides the following cards:
 **Version 0.1.8**
 - Fixed a bug that might cause the Nuki app to crash after adding your first lock.
 - Fixed a bug that caused the URL of the webhook not being set into the Nuki bridge, therefor it was impossible to get triggered after lockstate changes
-
-**Version 0.1.8**
-- Typofix
 
 **Version 0.1.7**
 - Bugfix
