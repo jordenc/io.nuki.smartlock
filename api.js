@@ -20,7 +20,10 @@ module.exports = [
 
 			var isLocked = false;
 			
-			if (args.body.stateName == 'Locked') isLocked = true;
+			if (args.body.stateName == 'locked') isLocked = true;
+			
+			Homey.log("Lockstate is now: " + isLocked);
+			
 			//Check if device still exists:
 			if (typeof devices[args.body.nukiId] !== 'undefined') {
 				

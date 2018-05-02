@@ -19,6 +19,9 @@ Want to show your appreciation for this app? A donation is possible via http://w
 
 
 
+**Version 0.2.2**
+- Fixed the realtime state of the lock
+
 **Version 0.2.1**
 - Typo fixed
 - Updated Readme to instruct to give Homey a static IP as well
