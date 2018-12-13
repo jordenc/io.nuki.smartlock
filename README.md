@@ -18,6 +18,8 @@ Provides the following cards:
 Want to show your appreciation for this app? A donation is possible via http://www.d2c.nl
 
 
+**Version 0.2.3**
+- Fixed compatibility version
 
 **Version 0.2.2**
 - Fixed the realtime state of the lock

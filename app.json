@@ -4,8 +4,8 @@
         "en": "Nuki Smartlock",
         "nl": "Nuki Smartlock"
     },
-    "version": "0.2.2",
-    "compatibility": "0.x || 1.x",
+    "version": "0.2.3",
+    "compatibility": "0.x || 1.x || 2.x",
     "author": {
         "name": "Chamid Media",
         "email": "info@chamidmedia.nl"
